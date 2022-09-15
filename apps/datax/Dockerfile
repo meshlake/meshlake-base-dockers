@@ -1,13 +1,13 @@
-FROM maven:3.6.3-openjdk-11 AS builder
+# FROM maven:3.6.3-openjdk-11 AS builder
 
-SHELL ["/bin/bash", "-c"]
+# SHELL ["/bin/bash", "-c"]
 
-WORKDIR /usr/local/
-RUN git clone https://github.com/meshlake/DataX.git
-WORKDIR /usr/local/DataX/
-RUN sed -i "s#<module>oscarwriter</module>#<!-- <module>oscarwriter</module> -->#" pom.xml
-RUN ls -al
-RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+# WORKDIR /usr/local/
+# RUN git clone https://github.com/meshlake/DataX.git
+# WORKDIR /usr/local/DataX/
+# RUN sed -i "s#<module>oscarwriter</module>#<!-- <module>oscarwriter</module> -->#" pom.xml
+# RUN ls -al
+# RUN mvn -U clean package assembly:assembly -Dmaven.test.skip=true
 
 FROM maven:3.6.3-openjdk-11
 
@@ -40,7 +40,8 @@ ENV MAVEN_HOME /usr/share/maven
 ENV PATH $PATH:$MAVEN_HOME/bin
 
 WORKDIR /app
-COPY --from=builder /usr/local/DataX/target/datax.tar.gz /app/
+# COPY --from=builder /usr/local/DataX/target/datax.tar.gz /app/
+COPY datax.tar.gz /app/
 RUN tar -xvf datax.tar.gz -C /app
 RUN rm -rf /app/datax.tar.gz
 WORKDIR /app/datax

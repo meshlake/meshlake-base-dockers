@@ -24,7 +24,17 @@ jobs:
     timeout-minutes: 45
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
+      - name: Checkout DataX
+        uses: actions/checkout@v3
+        with:
+          repository: meshlake/DataX
+          path: "./build/external"
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '11'
+          cache: 'maven'
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v1
         with:
@@ -50,6 +60,11 @@ jobs:
           registry: ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}
           username: ${{ secrets.MESHLAKE_HARBOR_CICD_USERNAME }}
           password: ${{ secrets.MESHLAKE_HARBOR_CICD_TOKEN }}
+      - name: Build with Maven
+        working-directory: "./build/external/DataX"
+        run: ｜
+          mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+          mv target/datax.tar.gz ${{ github.workspace }}/apps/datax/
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
