@@ -61,7 +61,7 @@ jobs:
           username: ${{ secrets.MESHLAKE_HARBOR_CICD_USERNAME }}
           password: ${{ secrets.MESHLAKE_HARBOR_CICD_TOKEN }}
       - name: Build with Maven
-        working-directory: "./build/external/DataX"
+        working-directory: "./build/external"
         run: ｜
           mvn -U clean package assembly:assembly -Dmaven.test.skip=true
           mv target/datax.tar.gz ${{ github.workspace }}/apps/datax/
