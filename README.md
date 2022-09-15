@@ -4,5 +4,5 @@ Dockerize base artifact repositories for product use
 
 ## Support List
 
-[ ] Datahub
-[ ] DataX
+- [ ] Datahub
+- [ ] DataX
