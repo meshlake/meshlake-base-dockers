@@ -4,5 +4,6 @@ Dockerize base artifact repositories for product use
 
 ## Support List
 
-- [x] Datahub
-- [ ] DataX
+- [x] LinkedIn Datahub
+- [x] Alibaba DataX
+- [ ] Greenplum
