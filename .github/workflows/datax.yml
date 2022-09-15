@@ -44,6 +44,12 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_HUB_CICD_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_CICD_TOKEN }}
+      - name: Login to Meshlake Harbor
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}
+          username: ${{ secrets.MESHLAKE_HARBOR_CICD_USERNAME }}
+          password: ${{ secrets.MESHLAKE_HARBOR_CICD_TOKEN }}
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
@@ -53,7 +59,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/amd64,linux/arm64
           push: true
-          tags: meshlake/datax:0.0.1
+          tags: meshlake/datax:0.0.1,${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/alibaba/datax:0.0.1
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
