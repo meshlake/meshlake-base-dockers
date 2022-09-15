@@ -1,5 +1,7 @@
 FROM linkedin/datahub-ingestion:head
 
+LABEL maintainer="Ding Wei devops@meshlake.com"
+
 USER root
 RUN apt-get update && apt-get install sudo -y
 RUN echo "datahub ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers
