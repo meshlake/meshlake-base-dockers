@@ -64,6 +64,7 @@ jobs:
         working-directory: "./build/external"
         run: |
           mvn -U clean package assembly:assembly -Dmaven.test.skip=true
+          du -h target/datax/
           mkdir -p ${{ github.workspace }}/apps/datax/target/
           mv target/datax/datax/* ${{ github.workspace }}/apps/datax/target/
           ls -al ${{ github.workspace }}/apps/datax/target/
