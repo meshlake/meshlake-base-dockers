@@ -64,7 +64,8 @@ jobs:
         working-directory: "./build/external"
         run: |
           mvn -U clean package assembly:assembly -Dmaven.test.skip=true
-          cp target/datax.tar.gz ${{ github.workspace }}/apps/datax/
+          mkdir -p ${{ github.workspace }}/apps/datax/target/
+          mv target/datax/* ${{ github.workspace }}/apps/datax/target/
       - name: Build and push
         id: docker_build
         uses: docker/build-push-action@v2
