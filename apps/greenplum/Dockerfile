@@ -17,4 +17,4 @@ RUN chgrp -R gpadmin /usr/local/greenplum*
 
 USER gpadmin
 WORKDIR /app/greenplum
-COPY ./setup /app/greenplum/
+COPY --chown=gpadmin:gpadmin ./setup /app/greenplum/setup
