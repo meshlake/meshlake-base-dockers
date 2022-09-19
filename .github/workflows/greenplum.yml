@@ -6,7 +6,7 @@ name: Vmware Greenplum
 on:
   push: 
     branches:
-      - main
+      - master
   # Triggers the workflow on push or pull request events but only for the main branch
   # schedule: 
   #   - cron: "30 16 * * 0"
