@@ -11,4 +11,6 @@ RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
 RUN groupadd gpadmin
 RUN useradd gpadmin -g gpadmin
 RUN echo gpadmin | passwd gpadmin --stdin
+RUN chown -R gpadmin:gpadmin /usr/local/greenplum*
+RUN chgrp -R gpadmin /usr/local/greenplum*
 
