@@ -9,13 +9,12 @@ RUN yum install -y greenplum-6.21.2.rpm
 RUN rm -rf greenplum-6.21.2.rpm
 
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
-RUN groupadd gpadmin
-RUN useradd gpadmin -g gpadmin
+RUN useradd gpadmin -g wheel
 RUN echo gpadmin | passwd gpadmin --stdin
-RUN chown -R gpadmin:gpadmin /usr/local/greenplum*
-RUN chgrp -R gpadmin /usr/local/greenplum*
+RUN chown -R gpadmin:wheel /usr/local/greenplum*
+RUN chgrp -R wheel /usr/local/greenplum*
 
 USER gpadmin
 WORKDIR /app/greenplum
-COPY --chown=gpadmin:gpadmin ./setup /app/greenplum/setup
-COPY --chown=gpadmin:gpadmin ./init.sh /app/greenplum/init.sh
+COPY --chown=gpadmin:wheel ./setup /app/greenplum/setup
+COPY --chown=gpadmin:wheel ./init.sh /app/greenplum/init.sh
