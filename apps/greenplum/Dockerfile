@@ -18,3 +18,4 @@ RUN chgrp -R gpadmin /usr/local/greenplum*
 USER gpadmin
 WORKDIR /app/greenplum
 COPY --chown=gpadmin:gpadmin ./setup /app/greenplum/setup
+COPY --chown=gpadmin:gpadmin ./init.sh /app/greenplum/init.sh
