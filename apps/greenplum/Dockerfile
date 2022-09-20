@@ -14,6 +14,7 @@ RUN rm -rf greenplum-6.21.2.rpm
 
 RUN useradd gpadmin -g wheel
 RUN echo gpadmin | passwd gpadmin --stdin
+RUN echo "gpadmin ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/gpadmin
 RUN chown -R gpadmin:wheel /usr/local/greenplum*
 RUN chgrp -R wheel /usr/local/greenplum*
 
@@ -22,4 +23,4 @@ WORKDIR /app/greenplum
 COPY --chown=gpadmin:wheel ./setup /app/greenplum/setup
 COPY --chown=gpadmin:wheel ./init.sh /app/greenplum/init.sh
 
-CMD [ "/usr/sbin/sshd", "-D" ]
+CMD [ "sudo", "/usr/sbin/sshd", "-D" ]
