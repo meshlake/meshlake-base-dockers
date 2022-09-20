@@ -62,7 +62,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           platforms: linux/amd64
           push: true
-          tags: meshlake/greenplum:6.21.2
+          tags: meshlake/greenplum-kubernetes:6.21.2,${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/greenplum-kubernetes:6.21.2
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest

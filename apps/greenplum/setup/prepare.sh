@@ -2,11 +2,12 @@
 
 set -x
 if [ -z ${GPHOME+x} ]; then echo "GPHOME is unset";exit 1 ; fi
-
+# if [ -z ${KUBERNETES_SERVICE_NAME+x} ]; then echo "";exit 1 ; fi
 
 MASTERHOST=`hostname`
-SEG_PREFIX=gp-
-SEG_HOSTNUM=0 # 0 means muster only
+SEG_PREFIX=${KUBERNETES_STATEFULSET_NAME:-greenplum}-
+KUBERNETES_SERVICE_NAME=${KUBERNETES_SERVICE_NAME:-greenplum}
+SEG_HOSTNUM=0 # 0 means master only
 SEG_NUMPERHOST=1
 VERBOSE=0
 
@@ -22,8 +23,8 @@ function checkInt()
 {
     expr $1 + 0 &>/dev/null
     if [ $? -ne 0 ]; then
-	echo "$0: $OPTARG is not a number." >&2
-	exit 1
+        echo "$0: $OPTARG is not a number." >&2
+        exit 1
     fi
 }
 
@@ -31,26 +32,26 @@ while getopts :hvm:n:s: arg
 do
     case $arg in
         h) help
-	    exit 1
-	    ;;
+	        exit 1
+	        ;;
 	
         m) MASTER="$OPTARG"
-	    checkInt $MASTER
+	        checkInt $MASTER
             ;;
 	
         n) SEG_NUMPERHOST="$OPTARG"
-	    checkInt $SEG_NUMPERHOST
+	        checkInt $SEG_NUMPERHOST
             ;;
-	s) SEG_HOSTNUM="$OPTARG"
-	    checkInt $SEG_HOSTNUM
-	    ;;
+        s) SEG_HOSTNUM="$OPTARG"
+            checkInt $SEG_HOSTNUM
+            ;;
         :) echo "$0: Must supply an argument to -$OPTARG." >&2
-	    help
+	        help
             exit 1
             ;;
 	
         \?) echo "Invalid option -$OPTARG ignored." >&2
-	    help
+	        help
             ;;
     esac
 done
@@ -84,10 +85,10 @@ sed "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEG
 
 >$HOSTFILE
 if [ $SEG_HOSTNUM -eq 0 ];then
-    echo $MASTERHOST >  $HOSTFILE 
+    echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE 
 else
     for i in $(seq 1 $SEG_HOSTNUM); do
-	echo $SEG_PREFIX$i >> $HOSTFILE
+	echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE
     done
 fi
 
