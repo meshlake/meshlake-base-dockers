@@ -12,9 +12,9 @@ fi
 # only run on master
 host=`hostname`
 if [ $host = "${KUBERNETES_STATEFULSET_NAME:-greenplum}-0" ];then
-    ssh-keygen -y -t rsa -b 4096 -f ${HOME}/.ssh/id_rsa -N ''
     source /usr/local/greenplum-db/greenplum_path.sh
     ./setup/prepare.sh -s 1 -n 1
+    # SSHPASS=gpadmin sshpass -f -e ssh-copy-id -o StrictHostKeyChecking=no 
     gpinitsystem -a -c gpinitsystem_config
     source env.sh
     ./setup/postinstall.sh

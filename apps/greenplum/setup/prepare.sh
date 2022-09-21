@@ -95,6 +95,7 @@ function create_hostfile() {
     if [ $SEG_HOSTNUM -eq 0 ];then
         echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE 
     else
+        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE
         for i in $(seq 1 $SEG_HOSTNUM); do
         echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE
         done
