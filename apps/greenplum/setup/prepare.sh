@@ -1,8 +1,12 @@
 #!/bin/bash
 
 set -x
-if [ -z ${GPHOME+x} ]; then echo "GPHOME is unset";exit 1 ; fi
-# if [ -z ${KUBERNETES_SERVICE_NAME+x} ]; then echo "";exit 1 ; fi
+
+# Verify if GPHOME is set
+if [ -z ${GPHOME+x} ]; then 
+    echo "GPHOME is unset";
+    exit 1; 
+fi
 
 MASTERHOST=`hostname`
 SEG_PREFIX=${KUBERNETES_STATEFULSET_NAME:-greenplum}-
@@ -10,6 +14,23 @@ KUBERNETES_SERVICE_NAME=${KUBERNETES_SERVICE_NAME:-greenplum}
 SEG_HOSTNUM=0 # 0 means master only
 SEG_NUMPERHOST=1
 VERBOSE=0
+
+CURDIR=$(cd $(dirname $0); pwd)
+PREFIX=$(pwd)
+CONFIGFILE=$PREFIX/gpinitsystem_config
+CONFIGTEMPLATE=$CURDIR/gpinitsystem_config_template
+HOSTFILE=$HOME/hostfile_exkeys
+
+MASTER_DATA_DIRECTORY=$PREFIX/master
+MASTER_STANDBY_DATA_DIRECTORY=$PREFIX/mirror
+DATA_DIRECTORY=$PREFIX/data
+
+PORT_BASE=10000
+MASTER_PORT=5432
+MIRROR_PORT_BASE=30000
+REPLICATION_PORT_BASE=31000
+MIRROR_REPLICATION_PORT_BASE=32000
+STARTDB=default
 
 function help()
 {
@@ -49,54 +70,49 @@ do
 	        help
             exit 1
             ;;
-	
         \?) echo "Invalid option -$OPTARG ignored." >&2
 	        help
             ;;
     esac
 done
 
+function reset_data_directories() {
+    rm -rf $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY
+    mkdir $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY
+}
 
-CURDIR=$(cd $(dirname $0); pwd)
-PREFIX=$(pwd)
-CONFIGFILE=$PREFIX/gpinitsystem_config
-CONFIGTEMPLATE=$CURDIR/gpinitsystem_config_template
-HOSTFILE=$PREFIX/hostfile
-
-
-PORT_BASE=10000
-MASTER_PORT=5432
-MIRROR_PORT_BASE=30000
-REPLICATION_PORT_BASE=31000
-MIRROR_REPLICATION_PORT_BASE=32000
-STARTDB=test
-
-
-rm -rf $PREFIX/master $PREFIX/data $PREFIX/mirror
-mkdir $PREFIX/master $PREFIX/data $PREFIX/mirror
-
-SEGDATASTR=""
-
-for i in $(seq 1 $SEG_NUMPERHOST);  do 
-    SEGDATASTR="$SEGDATASTR  $PREFIX/data"
-done
-
-sed "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEGDATASTR|g; s/%%MASTERHOST%%/$MASTERHOST/g; s/%%MASTER_PORT%%/$MASTER_PORT/g; s/%%MIRROR_PORT_BASE%%/$MIRROR_PORT_BASE/g; s/%%REPLICATION_PORT_BASE%%/$REPLICATION_PORT_BASE/g; s/%%MIRROR_REPLICATION_PORT_BASE%%/$MIRROR_REPLICATION_PORT_BASE/g; s/%%STARTDB%%/$STARTDB/g;" $CONFIGTEMPLATE >$CONFIGFILE 
-
->$HOSTFILE
-if [ $SEG_HOSTNUM -eq 0 ];then
-    echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE 
-else
-    for i in $(seq 1 $SEG_HOSTNUM); do
-	echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE
+function create_gpinitsystem_config() {
+    SEGDATASTR=""
+    for i in $(seq 1 $SEG_NUMPERHOST);  do 
+        SEGDATASTR="$SEGDATASTR  $PREFIX/data"
     done
-fi
 
-cat <<EOF > $PREFIX/env.sh
-source $GPHOME/greenplum_path.sh
-SRCDIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-export MASTER_DATA_DIRECTORY=\$SRCDIR/master/gpseg-1
-export PGPORT=$MASTER_PORT
-export PGHOST=$MASTER
-export PGDATABASE=$STARTDB
-EOF
+    sed "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEGDATASTR|g; s/%%MASTERHOST%%/$MASTERHOST/g; s/%%MASTER_PORT%%/$MASTER_PORT/g; s/%%MIRROR_PORT_BASE%%/$MIRROR_PORT_BASE/g; s/%%REPLICATION_PORT_BASE%%/$REPLICATION_PORT_BASE/g; s/%%MIRROR_REPLICATION_PORT_BASE%%/$MIRROR_REPLICATION_PORT_BASE/g; s/%%STARTDB%%/$STARTDB/g;" $CONFIGTEMPLATE >$CONFIGFILE
+}
+
+function create_hostfile() {
+    >$HOSTFILE
+    if [ $SEG_HOSTNUM -eq 0 ];then
+        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE 
+    else
+        for i in $(seq 1 $SEG_HOSTNUM); do
+        echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE
+        done
+    fi
+}
+
+function create_env_script() {
+    cat >$PREFIX/env.sh <<-EOD
+        source $GPHOME/greenplum_path.sh
+        SRCDIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
+        export MASTER_DATA_DIRECTORY=\$SRCDIR/master/gpseg-1
+        export PGPORT=$MASTER_PORT
+        export PGHOST=$MASTER
+        export PGDATABASE=$STARTDB
+EOD
+}
+
+reset_data_directories
+create_gpinitsystem_config
+create_hostfile
+create_env_script

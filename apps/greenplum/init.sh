@@ -1,4 +1,11 @@
 #!/bin/bash
+set -ex
+
+# Exist if it's not a statefulset 
+if [ `hostname` =~ -([0-9]+)$ ]; then 
+    echo "You must run greenplum as a stateful application using a StatefulSet.";
+    exit 1; 
+fi
 
 # whoami: gpadmin
 
