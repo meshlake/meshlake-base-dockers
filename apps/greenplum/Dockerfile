@@ -2,10 +2,6 @@ FROM centos:7.9.2009
 
 ARG GREENPLUM_VERSION=6.21.2
 RUN yum update -y && yum install openssh-server passwd bash sudo sshpass rsync -y && yum clean all 
-RUN mkdir -p /var/run/sshd
-RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
-RUN ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''
-RUN ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
 
 WORKDIR /app/build
 RUN yum install -y wget
@@ -23,7 +19,6 @@ RUN chown -R gpadmin:gpadmin /usr/local/greenplum*
 RUN chgrp -R gpadmin /usr/local/greenplum*
 
 USER gpadmin
-RUN ssh-keygen -t rsa -b 4096 -f /home/gpadmin/.ssh/id_rsa -N ''
 
 WORKDIR /app/greenplum
 COPY --chown=gpadmin:gpadmin ./setup /app/greenplum/setup
