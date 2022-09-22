@@ -75,4 +75,4 @@ DATABASE_NAME=%%STARTDB%%
 
 #### Specify the location of the host address file here instead of
 #### with the the -h option of gpinitsystem.
-MACHINE_LIST_FILE=hostfile
+MACHINE_LIST_FILE=%%HOSTFILE_GPINITSYSTEM%%

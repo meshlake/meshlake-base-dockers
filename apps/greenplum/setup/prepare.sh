@@ -19,7 +19,8 @@ CURDIR=$(cd $(dirname $0); pwd)
 PREFIX=$(pwd)
 CONFIGFILE=$PREFIX/gpinitsystem_config
 CONFIGTEMPLATE=$CURDIR/gpinitsystem_config_template
-HOSTFILE=$HOME/hostfile_exkeys
+HOSTFILE_EXKEYS=$HOME/hostfile_exkeys
+HOSTFILE_GPINITSYSTEM=$HOME/hostfile_gpinitsystem
 
 MASTER_DATA_DIRECTORY=$PREFIX/master
 MASTER_STANDBY_DATA_DIRECTORY=$PREFIX/mirror
@@ -87,17 +88,34 @@ function create_gpinitsystem_config() {
         SEGDATASTR="$SEGDATASTR  $PREFIX/data"
     done
 
-    sed "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEGDATASTR|g; s/%%MASTERHOST%%/$MASTERHOST/g; s/%%MASTER_PORT%%/$MASTER_PORT/g; s/%%MIRROR_PORT_BASE%%/$MIRROR_PORT_BASE/g; s/%%REPLICATION_PORT_BASE%%/$REPLICATION_PORT_BASE/g; s/%%MIRROR_REPLICATION_PORT_BASE%%/$MIRROR_REPLICATION_PORT_BASE/g; s/%%STARTDB%%/$STARTDB/g;" $CONFIGTEMPLATE >$CONFIGFILE
+    sed -e "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEGDATASTR|g;" \
+        -e "s/%%MASTERHOST%%/$MASTERHOST.$KUBERNETES_SERVICE_NAME/g; s/%%MASTER_PORT%%/$MASTER_PORT/g;" \
+        -e "s/%%MIRROR_PORT_BASE%%/$MIRROR_PORT_BASE/g;" \
+        -e "s/%%REPLICATION_PORT_BASE%%/$REPLICATION_PORT_BASE/g;" \
+        -e "s/%%MIRROR_REPLICATION_PORT_BASE%%/$MIRROR_REPLICATION_PORT_BASE/g;" \
+        -e "s/%%STARTDB%%/$STARTDB/g;" \
+        -e "s/%%HOSTFILE_GPINITSYSTEM%%/$HOSTFILE_GPINITSYSTEM/g;" $CONFIGTEMPLATE >$CONFIGFILE
 }
 
-function create_hostfile() {
-    >$HOSTFILE
+function create_hostfile_exkeys() {
+    >$HOSTFILE_EXKEYS
     if [ $SEG_HOSTNUM -eq 0 ];then
-        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE 
+        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE_EXKEYS 
     else
-        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE
+        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE_EXKEYS
         for i in $(seq 1 $SEG_HOSTNUM); do
-        echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE
+        echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE_EXKEYS
+        done
+    fi
+}
+
+function create_hostfile_gpinitsystem() {
+    >$HOSTFILE_GPINITSYSTEM
+    if [ $SEG_HOSTNUM -eq 0 ];then
+        echo $MASTERHOST.$KUBERNETES_SERVICE_NAME >  $HOSTFILE_GPINITSYSTEM 
+    else
+        for i in $(seq 1 $SEG_HOSTNUM); do
+        echo $SEG_PREFIX$i.$KUBERNETES_SERVICE_NAME >> $HOSTFILE_GPINITSYSTEM
         done
     fi
 }
@@ -115,5 +133,6 @@ EOD
 
 reset_data_directories
 create_gpinitsystem_config
-create_hostfile
+create_hostfile_exkeys
+create_hostfile_gpinitsystem
 create_env_script
