@@ -2,12 +2,15 @@
 
 set -x
 
+source /usr/local/greenplum-db/greenplum_path.sh
+
 # Verify if GPHOME is set
 if [ -z ${GPHOME+x} ]; then 
     echo "GPHOME is unset";
     exit 1; 
 fi
 
+USER=`whoami`
 MASTERHOST=`hostname`
 SEG_PREFIX=${KUBERNETES_STATEFULSET_NAME:-greenplum}-
 KUBERNETES_SERVICE_NAME=${KUBERNETES_SERVICE_NAME:-greenplum}
@@ -78,8 +81,8 @@ do
 done
 
 function reset_data_directories() {
-    rm -rf $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY
-    mkdir $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "rm -rf $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY"
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "mkdir -p $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY"
 }
 
 function create_gpinitsystem_config() {
@@ -131,8 +134,17 @@ function create_env_script() {
 EOD
 }
 
-reset_data_directories
+function enable_passwordless_ssh() {
+    cat $HOSTFILE_EXKEYS | xargs -I{} sh -c 'ssh-keyscan -H {} >> ~/.ssh/known_hosts'
+    cat $HOSTFILE_EXKEYS | xargs -I{} sh -c 'SSHPASS=gpadmin sshpass -e ssh-copy-id {}'
+    gpssh-exkeys -f $HOSTFILE_EXKEYS
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e 'ls -l /usr/local/greenplum-db/'
+}
+
 create_gpinitsystem_config
 create_hostfile_exkeys
 create_hostfile_gpinitsystem
 create_env_script
+
+enable_passwordless_ssh
+reset_data_directories
