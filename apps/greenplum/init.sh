@@ -14,11 +14,6 @@ host=`hostname`
 if [ $host = "${KUBERNETES_STATEFULSET_NAME:-greenplum}-0" ];then
     source /usr/local/greenplum-db/greenplum_path.sh
     ./setup/prepare.sh -s 1 -n 1
-    # checking if all host are reachable
-    # nc -z greenplum-0.greenplum 22
-    cat ~/hostfile_exkeys | xargs -I{} sh -c 'ssh-keyscan -H {} >> ~/.ssh/known_hosts'
-    cat ~/hostfile_exkeys | xargs -I{} sh -c 'SSHPASS=gpadmin sshpass -e ssh-copy-id {}'
-    gpssh-exkeys -f ~/hostfile_exkeys
     gpinitsystem -a -c gpinitsystem_config
     source env.sh
     ./setup/postinstall.sh

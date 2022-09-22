@@ -20,14 +20,19 @@ VERBOSE=0
 
 CURDIR=$(cd $(dirname $0); pwd)
 PREFIX=$(pwd)
-CONFIGFILE=$PREFIX/gpinitsystem_config
-CONFIGTEMPLATE=$CURDIR/gpinitsystem_config_template
-HOSTFILE_EXKEYS=$HOME/hostfile_exkeys
-HOSTFILE_GPINITSYSTEM=$HOME/hostfile_gpinitsystem
 
-MASTER_DATA_DIRECTORY=$PREFIX/master
-MASTER_STANDBY_DATA_DIRECTORY=$PREFIX/mirror
-DATA_DIRECTORY=$PREFIX/data
+CONF_GENERATED_DIR=/app/greenplum/gennerated
+DATA_BASE_DIR=/app/greenplum/data
+mkdir -p $CONF_GENERATED_DIR $DATA_BASE_DIR
+
+CONFIGTEMPLATE=$CURDIR/gpinitsystem_config_template
+CONFIGFILE=$CONF_GENERATED_DIR/gpinitsystem_config
+HOSTFILE_EXKEYS=$CONF_GENERATED_DIR/hostfile_exkeys
+HOSTFILE_GPINITSYSTEM=$CONF_GENERATED_DIR/hostfile_gpinitsystem
+
+MASTER_DATA_BASE_DIR=$DATA_BASE_DIR/master
+MASTER_STANDBY_DATA_BASE_DIR=$DATA_BASE_DIR/mirror
+DATA_BASE_DIR=$PREFIX/data
 
 PORT_BASE=10000
 MASTER_PORT=5432
@@ -81,23 +86,25 @@ do
 done
 
 function reset_data_directories() {
-    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "rm -rf $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY"
-    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "mkdir -p $MASTER_DATA_DIRECTORY $DATA_DIRECTORY $MASTER_STANDBY_DATA_DIRECTORY"
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "rm -rf $MASTER_DATA_BASE_DIR $MASTER_STANDBY_DATA_BASE_DIR"
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "mkdir -p $MASTER_DATA_BASE_DIR $MASTER_STANDBY_DATA_BASE_DIR"
 }
 
 function create_gpinitsystem_config() {
     SEGDATASTR=""
     for i in $(seq 1 $SEG_NUMPERHOST);  do 
-        SEGDATASTR="$SEGDATASTR  $PREFIX/data"
+        SEGDATASTR="$SEGDATASTR  $DATA_BASE_DIR"
     done
 
     sed -e "s/%%PORT_BASE%%/$PORT_BASE/g; s|%%PREFIX%%|$PREFIX|g; s|%%SEGDATASTR%%|$SEGDATASTR|g;" \
-        -e "s/%%MASTERHOST%%/$MASTERHOST.$KUBERNETES_SERVICE_NAME/g; s/%%MASTER_PORT%%/$MASTER_PORT/g;" \
+        -e "s|%%MASTER_DATA_BASE_DIR%%|$MASTER_DATA_BASE_DIR|g;" \
+        -e "s|%%MASTER_STANDBY_DATA_BASE_DIR%%|$MASTER_STANDBY_DATA_BASE_DIR|g;" \
+        -e "s|%%MASTERHOST%%|$MASTERHOST.$KUBERNETES_SERVICE_NAME|g; s/%%MASTER_PORT%%/$MASTER_PORT/g;" \
         -e "s/%%MIRROR_PORT_BASE%%/$MIRROR_PORT_BASE/g;" \
         -e "s/%%REPLICATION_PORT_BASE%%/$REPLICATION_PORT_BASE/g;" \
         -e "s/%%MIRROR_REPLICATION_PORT_BASE%%/$MIRROR_REPLICATION_PORT_BASE/g;" \
         -e "s/%%STARTDB%%/$STARTDB/g;" \
-        -e "s/%%HOSTFILE_GPINITSYSTEM%%/$HOSTFILE_GPINITSYSTEM/g;" $CONFIGTEMPLATE >$CONFIGFILE
+        -e "s|%%HOSTFILE_GPINITSYSTEM%%|$HOSTFILE_GPINITSYSTEM|g;" $CONFIGTEMPLATE >$CONFIGFILE
 }
 
 function create_hostfile_exkeys() {
@@ -127,7 +134,7 @@ function create_env_script() {
     cat >$PREFIX/env.sh <<-EOD
         source $GPHOME/greenplum_path.sh
         SRCDIR="\$( cd "\$( dirname "\${BASH_SOURCE[0]}" )" && pwd )"
-        export MASTER_DATA_DIRECTORY=\$SRCDIR/master/gpseg-1
+        export MASTER_DATA_BASE_DIR=$MASTER_DATA_BASE_DIR/gpseg-1
         export PGPORT=$MASTER_PORT
         export PGHOST=$MASTER
         export PGDATABASE=$STARTDB
@@ -135,6 +142,8 @@ EOD
 }
 
 function enable_passwordless_ssh() {
+    # checking if all host are reachable
+    # nc -z greenplum-0.greenplum 22
     cat $HOSTFILE_EXKEYS | xargs -I{} sh -c 'ssh-keyscan -H {} >> ~/.ssh/known_hosts'
     cat $HOSTFILE_EXKEYS | xargs -I{} sh -c 'SSHPASS=gpadmin sshpass -e ssh-copy-id {}'
     gpssh-exkeys -f $HOSTFILE_EXKEYS

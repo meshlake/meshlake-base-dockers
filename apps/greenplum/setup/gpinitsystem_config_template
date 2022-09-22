@@ -29,7 +29,7 @@ MASTER_HOSTNAME=%%MASTERHOST%%
 
 #### File system location where the master data directory 
 #### will be created.
-MASTER_DIRECTORY=%%PREFIX%%/master
+MASTER_DIRECTORY=%%MASTER_DATA_BASE_DIR%%
 
 #### Port number for the master instance. 
 MASTER_PORT=%%MASTER_PORT%%
@@ -63,7 +63,7 @@ ENCODING=UNICODE
 #### will be created. The number of mirror locations must equal the
 #### number of primary locations as specified in the 
 #### DATA_DIRECTORY parameter.
-#declare -a MIRROR_DATA_DIRECTORY=(%%PREFIX%%/mirror)
+#declare -a MIRROR_DATA_DIRECTORY=(%%MASTER_STANDBY_DATA_BASE_DIR%%)
 
 
 ################################################
