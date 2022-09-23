@@ -8,7 +8,6 @@ RUN ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''
 RUN ssh-keygen -t ed25519 -f /etc/ssh/ssh_host_ed25519_key -N ''
 
 RUN echo "RemoveIPC=no" >> /etc/systemd/logind.conf
-RUN service systemd-logind restart
 
 WORKDIR /app/build
 RUN yum install -y wget
