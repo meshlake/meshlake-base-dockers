@@ -11,6 +11,7 @@ if [ -z ${GPHOME+x} ]; then
 fi
 
 USER=`whoami`
+GROUP=`id -gn`
 MASTERHOST=`hostname`
 SEG_PREFIX=${KUBERNETES_STATEFULSET_NAME:-greenplum}-
 KUBERNETES_SERVICE_NAME=${KUBERNETES_SERVICE_NAME:-greenplum}
@@ -86,6 +87,7 @@ do
 done
 
 function reset_data_directories() {
+    gpssh -u $USER -f $HOSTFILE_EXKEYS -e "sudo chown $USER:$GROUP $DATA_BASE_DIR"
     gpssh -u $USER -f $HOSTFILE_EXKEYS -e "rm -rf $MASTER_DATA_BASE_DIR $MASTER_STANDBY_DATA_BASE_DIR"
     gpssh -u $USER -f $HOSTFILE_EXKEYS -e "mkdir -p $MASTER_DATA_BASE_DIR $MASTER_STANDBY_DATA_BASE_DIR"
 }
