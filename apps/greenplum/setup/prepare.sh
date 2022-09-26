@@ -13,7 +13,7 @@ fi
 USER=`whoami`
 GROUP=`id -gn`
 MASTERHOST=`hostname`
-PASSWORD=${PASSWORD:-greenplum}
+PASSWORD=${PASSWORD:-gpadmin}
 SEG_PREFIX=${KUBERNETES_STATEFULSET_NAME:-greenplum}-
 KUBERNETES_SERVICE_NAME=${KUBERNETES_SERVICE_NAME:-greenplum}
 SEG_HOSTNUM=0 # 0 means master only
@@ -23,7 +23,7 @@ VERBOSE=0
 CURDIR=$(cd $(dirname $0); pwd)
 PREFIX=$(pwd)
 
-CONF_GENERATED_DIR=/app/greenplum/gennerated
+CONF_GENERATED_DIR=/app/greenplum/generated
 DATA_BASE_DIR=/app/greenplum/data
 mkdir -p $CONF_GENERATED_DIR $DATA_BASE_DIR
 
