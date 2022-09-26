@@ -15,7 +15,7 @@ if [ $host = "${KUBERNETES_STATEFULSET_NAME:-greenplum}-0" ];then
     source /usr/local/greenplum-db/greenplum_path.sh
     ./setup/prepare.sh -s 1 -n 1
     gpinitsystem -a -c generated/gpinitsystem_config
-    source env.sh
+    source generated/env.sh
     ./setup/postinstall.sh
     gpstate -s
 fi
