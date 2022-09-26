@@ -1,7 +1,7 @@
 FROM centos:7.9.2009
 
 ARG GREENPLUM_VERSION=6.21.2
-RUN yum update -y && yum install openssh-server passwd bash sudo sshpass rsync -y && yum clean all 
+RUN yum update -y && yum install openssh-server passwd bash sudo sshpass rsync nc -y && yum clean all 
 RUN mkdir -p /var/run/sshd
 RUN ssh-keygen -t rsa -f /etc/ssh/ssh_host_rsa_key -N ''
 RUN ssh-keygen -t ecdsa -f /etc/ssh/ssh_host_ecdsa_key -N ''
