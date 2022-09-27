@@ -199,7 +199,7 @@ function init() {
 
 function post_init() {
     source $GP_ENV_CONFIG_FILE
-    echo "host all gpadmin 0.0.0.0/0 trust"  >> $MASTER_DATA_DIRECTORY/pg_hba.conf
+    # echo "host all gpadmin 0.0.0.0/0 trust"  >> $MASTER_DATA_DIRECTORY/pg_hba.conf
     gpstop -u
 }
 
