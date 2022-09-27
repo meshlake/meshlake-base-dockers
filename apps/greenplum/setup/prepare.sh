@@ -165,18 +165,30 @@ function reset_data_directories() {
     done
 }
 
+function repair_data_directories() {
+    for host in `cat $HOSTFILE_EXKEYS`; do
+        gpssh -u $USER -h $host -e "sudo chown $USER:$GROUP $DATA_BASE_DIR"
+    done
+}
+
 function init_gp() {
     gpinitsystem --ignore-warnings -a -c $GP_INIT_CONFIG_FILE
 }
 
 function init() {
     if [ $GPINIT_ENABLED -ne 1 ];then
-        echo "Greenplum initalization is disabled, skip data directory reset and gpinitsystem trigger." 
+        echo "Repair the greenplum system..."
+        repair_data_directories
+        source $GP_ENV_CONFIG_FILE
+        echo -e "\nGreenplum Repair Completed!\n"
+        gpstart
+        echo "source ${PREFIX}/generated/env.sh" >> ~/.bashrc
     else
         echo "Start to intialize greenplum..."
         reset_data_directories
         init_gp
         echo -e "\nGreenplum Intialization Completed!\n"
+        post_init
     fi
 }
 
@@ -195,6 +207,5 @@ create_env_script
 
 enable_passwordless_ssh
 init
-post_init
 
 echo -e "\nGreenplum Preparation Completed!\n"
