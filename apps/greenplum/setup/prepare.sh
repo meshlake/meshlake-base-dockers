@@ -180,8 +180,8 @@ function init() {
         echo "Repair the greenplum system..."
         repair_data_directories
         source $GP_ENV_CONFIG_FILE
-        echo -e "\nGreenplum Repair Completed!\n"
         gpstart
+        echo -e "\nGreenplum Repair Completed!\n"
         echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
     else
         echo "Start to intialize greenplum..."
