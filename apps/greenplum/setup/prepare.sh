@@ -180,9 +180,12 @@ function init() {
         echo "Repair the greenplum system..."
         repair_data_directories
         source $GP_ENV_CONFIG_FILE
-        gpstart
+        if `gpstate -b -q`; then 
+            gpstop -u
+        else
+            gpstart -a
+        fi
         echo -e "\nGreenplum Repair Completed!\n"
-        echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
     else
         echo "Start to intialize greenplum..."
         reset_data_directories
@@ -190,14 +193,14 @@ function init() {
         echo -e "\nGreenplum Intialization Completed!\n"
         post_init
     fi
+    gpstate -s
+    echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
 }
 
 function post_init() {
     source $GP_ENV_CONFIG_FILE
     echo "host all gpadmin 0.0.0.0/0 trust"  >> $MASTER_DATA_DIRECTORY/pg_hba.conf
     gpstop -u
-    echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
-    gpstate -s
 }
 
 create_gpinitsystem_config
