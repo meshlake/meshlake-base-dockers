@@ -182,7 +182,7 @@ function init() {
         source $GP_ENV_CONFIG_FILE
         echo -e "\nGreenplum Repair Completed!\n"
         gpstart
-        echo "source ${PREFIX}/generated/env.sh" >> ~/.bashrc
+        echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
     else
         echo "Start to intialize greenplum..."
         reset_data_directories
@@ -196,7 +196,7 @@ function post_init() {
     source $GP_ENV_CONFIG_FILE
     echo "host all gpadmin 0.0.0.0/0 trust"  >> $MASTER_DATA_DIRECTORY/pg_hba.conf
     gpstop -u
-    echo "source ${PREFIX}/generated/env.sh" >> ~/.bashrc
+    echo "source $GP_ENV_CONFIG_FILE" >> ~/.bashrc
     gpstate -s
 }
 
