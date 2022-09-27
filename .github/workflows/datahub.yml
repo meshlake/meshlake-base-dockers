@@ -5,8 +5,13 @@ name: LinkedIn Datahub
 # Controls when the workflow will run
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
-  schedule: 
-    - cron: "15 17 * * 0"
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/datahub/**'
+      - '!apps/datahub/**.md'
+      - '!apps/datahub/**/docs/**'
 # env: 
 #   IS_MILESTONE_BRANCH: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags') }}
 #   IS_MILESTONE_CHANGE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags')) && github.event_name == 'push' }}
