@@ -1,5 +1,5 @@
 #!/bin/bash
-set -ex
+set -e
 
 # Exist if it's not a statefulset 
 if [ `hostname` =~ -([0-9]+)$ ]; then 
@@ -12,10 +12,9 @@ fi
 # only run on master
 host=`hostname`
 if [ $host = "${KUBERNETES_STATEFULSET_NAME:-greenplum}-0" ];then
-    source /usr/local/greenplum-db/greenplum_path.sh
+    # For non first time start
     ./setup/prepare.sh -s 1 -n 1
-    gpinitsystem -a -c generated/gpinitsystem_config
-    source generated/env.sh
-    ./setup/postinstall.sh
-    gpstate -s
+
+    # For first time intialization
+    # ./setup/prepare.sh -s 1 -n 1 -i
 fi
