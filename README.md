@@ -1,6 +1,6 @@
-# meshlake-base-dockers
+# The Meshlake Containers Library
 
-Dockerize base artifact repositories for product use
+Applications, provided by Meshlake, containerized and ready to launch for production use.
 
 ## Support List
 
