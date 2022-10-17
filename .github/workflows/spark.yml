@@ -72,10 +72,10 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: | 
-            BITNAMI_SPARK_VERSION=${{ github.event.inputs.bitnami_spark_version }}
+            BITNAMI_SPARK_VERSION=${{ INPUT_bitnami_spark_version }}
           tags: |
-            meshlake/spark:${{ github.event.inputs.bitnami_spark_version }}
-            ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/spark:${{ github.event.inputs.bitnami_spark_version }}
+            meshlake/spark:${{ INPUT_bitnami_spark_version }}
+            ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/spark:${{ INPUT_bitnami_spark_version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
