@@ -23,7 +23,7 @@ on:
     inputs:
       bitnami_spark_version: 
         description: "Bitnami Spark version"
-        required: false
+        required: true
         default: "3.3.0-debian-11-r42"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -72,10 +72,10 @@ jobs:
           platforms: linux/amd64
           push: true
           build-args: | 
-            BITNAMI_SPARK_VERSION=${{ INPUT_BITNAMI_SPARK_VERSION }}
+            BITNAMI_SPARK_VERSION=${{ inputs.bitnami_spark_version }}
           tags: |
-            meshlake/spark:${{ INPUT_BITNAMI_SPARK_VERSION }}
-            ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/spark:${{ INPUT_BITNAMI_SPARK_VERSION }}
+            meshlake/spark:${{ inputs.bitnami_spark_version }}
+            ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/spark:${{ inputs.bitnami_spark_version }}
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: Image digest
