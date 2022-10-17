@@ -7,6 +7,7 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 - [x] LinkedIn Datahub
 - [x] Alibaba DataX
 - [x] Greenplum
+- [ ] Spark
 
 ## Release Tags & Features
 
@@ -30,3 +31,7 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 
 - Tags: `meshlake/greenplum-kubernetes:6.21.2`,`${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/greenplum-kubernetes:6.21.2`
 - Release date: `2022-09-28`
+
+### Apache Spark
+
+#### `spark:3.3.0-debian-11-r42`
