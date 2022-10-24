@@ -35,3 +35,8 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 ### Apache Spark
 
 #### `spark:3.3.0-debian-11-r42`
+
+Based on `bitnami/spark:3.3.0-debian-11-r42`, including the following extra features:
+
+- Introduce user `spark` with uid `1001`, as bitnami containers are [non-root](https://docs.bitnami.com/tutorials/running-non-root-containers-on-openshift) and it causes STS failed to start.
+- 
