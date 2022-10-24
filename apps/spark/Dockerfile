@@ -1,4 +1,4 @@
-ARG BITNAMI_SPARK_VERSION=3.3.0-debian-11-r42
+ARG BITNAMI_SPARK_VERSION
 
 FROM maven:3.6.3-openjdk-11 as builder
 
@@ -7,7 +7,7 @@ RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy \
     -Dartifact=org.apache.hudi:hudi-spark3.1-bundle_2.12:0.12.1 \
     -DoutputDirectory=.
 
-FROM bitnami/spark:${BITNAMI_SPARK_VERSION}
+FROM bitnami/spark:${BITNAMI_SPARK_VERSION:-3.3.0-debian-11-r42}
 
 USER root
 RUN useradd spark -u 1001 -r -m -g root
