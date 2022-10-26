@@ -108,6 +108,7 @@ COPY ./target/plugin/writer/streamwriter /app/datax/plugin/writer/streamwriter
 COPY ./target/plugin/writer/tdenginewriter /app/datax/plugin/writer/tdenginewriter
 COPY ./target/plugin/writer/tsdbwriter /app/datax/plugin/writer/tsdbwriter
 COPY ./target/plugin/writer/txtfilewriter /app/datax/plugin/writer/txtfilewriter
+COPY ./target/plugin/writer/gpdbwriter /app/datax/plugin/writer/gpdbwriter
 
 ENTRYPOINT ["/usr/bin/python", "/app/datax/bin/datax.py"]
 CMD [""]
