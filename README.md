@@ -7,7 +7,8 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 - [x] LinkedIn Datahub
 - [x] Alibaba DataX
 - [x] Greenplum
-- [ ] Spark
+- [x] Spark
+- [ ] Airflow
 
 ## Release Tags & Features
 
@@ -41,3 +42,10 @@ Based on `bitnami/spark:3.3.0-debian-11-r42`, including the following extra feat
 - Introduce user `spark` with uid `1001`, as bitnami containers are [non-root](https://docs.bitnami.com/tutorials/running-non-root-containers-on-openshift) and it causes STS failed to start.
 - Pre-install jars into spark classpath as which can't set up properly with STS through `--packages`:
   - `org.apache.hudi:hudi-spark3.1-bundle_2.12:0.12.1`
+
+### Apache Airflow
+
+Based on `apache/airflow:2.3.0`, including the following extra features:
+
+- Extra built-in providers:
+  - `apache-airflow-providers-apache-spark`
