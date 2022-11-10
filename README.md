@@ -8,7 +8,7 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 - [x] Alibaba DataX
 - [x] Greenplum
 - [x] Spark
-- [ ] Airflow
+- [x] Airflow
 
 ## Release Tags & Features
 
