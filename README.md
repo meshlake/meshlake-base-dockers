@@ -9,6 +9,7 @@ Applications, provided by Meshlake, containerized and ready to launch for produc
 - [x] Greenplum
 - [x] Spark
 - [x] Airflow
+- [x] Kafka Connect
 
 ## Release Tags & Features
 
@@ -49,3 +50,11 @@ Based on `apache/airflow:2.3.0`, including the following extra features:
 
 - Extra built-in providers:
   - `apache-airflow-providers-apache-spark`
+
+### Kafka Connect (Confluent)
+
+Based on `confluentinc/cp-kafka-connect:7.3.0`, including the following extra features:
+
+- Extra built-in connectors:
+  - `confluentinc/kafka-connect-jdbc:10.6.0`
+  - `confluentinc/kafka-connect-datagen:0.6.0`

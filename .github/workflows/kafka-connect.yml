@@ -1,0 +1,82 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Confluent Kafka Connect
+
+# Controls when the workflow will run
+on:
+  push:
+    branches:
+      - master
+    paths:
+      - 'apps/kafka-connect/**'
+      - '!apps/kafka-connect/**.md'
+      - '!apps/kafka-connect/**/docs/**'
+  # Triggers the workflow on push or pull request events but only for the main branch
+  # schedule: 
+  #   - cron: "30 16 * * 0"
+# env: 
+#   IS_MILESTONE_BRANCH: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags') }}
+#   IS_MILESTONE_CHANGE: ${{ (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags')) && github.event_name == 'push' }}
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+    inputs:
+      confluent_platform_version: 
+        description: "Confluent Platform version"
+        required: true
+        default: "7.3.0"
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  publish:
+    name: Build and publish Confluent Kafka Connect artifact repositories
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v1
+        with:
+          image: tonistiigi/binfmt:latest
+          platforms: all
+      - name: Set up Docker Buildx
+        id: buildx
+        uses: docker/setup-buildx-action@v1
+      - name: Cache Docker layers
+        uses: actions/cache@v2
+        with:
+          path: /tmp/.buildx-cache
+          key: ${{ runner.os }}-buildx-confluent-platform-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-buildx-confluent-platform-
+      - uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_HUB_CICD_USERNAME }}
+          password: ${{ secrets.DOCKER_HUB_CICD_TOKEN }}
+      - name: Login to Meshlake Harbor
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}
+          username: ${{ secrets.MESHLAKE_HARBOR_CICD_USERNAME }}
+          password: ${{ secrets.MESHLAKE_HARBOR_CICD_TOKEN }}
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          context: ./apps/kafka-connect
+          file: ./apps/kafka-connect/Dockerfile
+          builder: ${{ steps.buildx.outputs.name }}
+          platforms: linux/amd64
+          push: true
+          build-args: | 
+            CONFLUENT_PLATFORM_VERSION=${{ inputs.confluent_platform_version || 'latest' }}
+          tags: |
+            meshlake/kafka-connect:${{ inputs.confluent_platform_version || 'latest' }}
+            ${{ secrets.MESHLAKE_HARBOR_REGISTRY }}/dockerio/kafka-connect:${{ inputs.confluent_platform_version || 'latest' }}
+          cache-from: type=local,src=/tmp/.buildx-cache
+          cache-to: type=local,dest=/tmp/.buildx-cache
+      - name: Image digest
+        run: echo ${{ steps.docker_build.outputs.digest }}
