@@ -16,5 +16,6 @@ RUN echo "spark:spark" | chpasswd
 # RUN echo "spark ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/spark
 USER spark
 
+RUN ls -al /opt/bitnami/spark/
 RUN mkdir -p /opt/bitnami/spark/extra/jars
 COPY --from=builder --chown=spark:root /opt/meshlake/builder/extra_spark_jars /opt/bitnami/spark/extra/jars
