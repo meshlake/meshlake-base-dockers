@@ -6,6 +6,7 @@ WORKDIR /opt/meshlake/builder/extra_spark_jars
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.postgresql:postgresql:42.5.0 -DoutputDirectory=.
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-spark3.3-bundle_2.12:0.12.1 -DoutputDirectory=.
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-utilities-bundle_2.12:0.12.1 -DoutputDirectory=.
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.1.0 -DoutputDirectory=.
 
 FROM bitnami/spark:${BITNAMI_SPARK_VERSION:-latest}
 
@@ -15,5 +16,5 @@ RUN echo "spark:spark" | chpasswd
 # RUN echo "spark ALL=(ALL) NOPASSWD: ALL" > /etc/sudoers.d/spark
 USER spark
 
-
-COPY --from=builder --chown=spark:root /opt/meshlake/builder/extra_spark_jars /opt/bitnami/spark/jars/
+RUN mkdir -p /opt/bitnami/spark/extra/jars
+COPY --from=builder --chown=spark:root /opt/meshlake/builder/extra_spark_jars /opt/bitnami/spark/extra/jars
