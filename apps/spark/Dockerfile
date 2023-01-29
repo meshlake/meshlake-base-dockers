@@ -4,9 +4,11 @@ FROM maven:3.6.3-openjdk-11 as builder
 
 WORKDIR /opt/meshlake/builder/extra_spark_jars
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.postgresql:postgresql:42.5.0 -DoutputDirectory=.
-RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-spark3.3-bundle_2.12:0.12.1 -DoutputDirectory=.
-RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-utilities-bundle_2.12:0.12.1 -DoutputDirectory=.
+# RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-spark3.3-bundle_2.12:0.12.1 -DoutputDirectory=.
+# RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.hudi:hudi-utilities-bundle_2.12:0.12.1 -DoutputDirectory=.
 RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=org.apache.iceberg:iceberg-spark-runtime-3.3_2.12:1.1.0 -DoutputDirectory=.
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=software.amazon.awssdk:url-connection-client:2.17.257 -DoutputDirectory=.
+RUN mvn org.apache.maven.plugins:maven-dependency-plugin:3.3.0:copy -Dartifact=software.amazon.awssdk:bundle:2.17.257 -DoutputDirectory=.
 
 FROM bitnami/spark:${BITNAMI_SPARK_VERSION:-latest}
 
