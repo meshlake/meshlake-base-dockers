@@ -1,0 +1,23 @@
+default:
+  target: "{{ env_var('DBT_PROFILE_DEFAULT_TARGET', 'dev') }}"
+  outputs:
+    dev:
+      type: postgres
+      threads: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_THREADS', '1') }}"
+      host: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_HOST') }}"
+      port: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_PORT', '5432') }}"
+      user: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_USER') }}"
+      pass: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_PASS') }}"
+      dbname: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_DBNAME') }}"
+      schema: "{{ env_var('DBT_PROFILE_DEFAULT_DEV_SCHEMA', 'public') }}"
+    prod:
+      type: postgres
+      threads: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_THREADS', '2') }}"
+      host: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_HOST') }}"
+      port: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_PORT', '5432') }}"
+      user: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_USER') }}"
+      pass: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_PASS') }}"
+      dbname: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_DBNAME') }}"
+      schema: "{{ env_var('DBT_PROFILE_DEFAULT_PROD_SCHEMA', 'public') }}"
+
+
