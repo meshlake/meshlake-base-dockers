@@ -2,6 +2,7 @@ ARG DBT_POSTGRES_VERSION
 
 FROM ghcr.io/dbt-labs/dbt-postgres:${DBT_POSTGRES_VERSION:-latest}
 
+RUN apt-get update -y && apt-get install curl -y
 COPY install.sh /usr/local/etc/metaplane/
 RUN /usr/local/etc/metaplane/install.sh
 
